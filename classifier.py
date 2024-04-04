@@ -19,7 +19,7 @@ def svm_classifier(X_train, X_test):
     X_test_flat = X_test.reshape(X_test.shape[0], -1)
 
     # Create and train the SVM classifier
-    svm_classifier = SVC(kernel='linear')
+    svm_classifier = SVC(kernel='linear', verbose=True)
     svm_classifier.fit(X_train_flat, y_train)
 
     # Predict labels for test data
@@ -86,29 +86,21 @@ if __name__ == '__main__':
     plt.xlabel('Predicted labels')
     plt.ylabel('True labels')
     plt.title('Confusion Matrix')
-    plt.show()
+    plt.savefig("confusion_matrix.png")
 
-    misclassified_indices = np.where(y_pred != y_test)[0]
 
-    # Show misclassified images
-    for index in misclassified_indices:
-        print("True Label:", list_folder[y_test[index]], ", Predicted Label:", list_folder[y_pred[index]])
-        plt.imshow(X_test[index])
-        plt.axis('off')
-        plt.title("True Label:" + list_folder[y_test[index]] + ", Predicted Label:" + list_folder[y_pred[index]])
-        plt.show()
-
-    # Create a figure to aggregate correct predictions
+    # Create a figure to aggregate the predictions
     fig, axes = plt.subplots(nrows=5, ncols=10, figsize=(20, 10))
 
     # Initialize counter for subplot indices
     row_index = 0
     col_index = 0
+    
 
     # Iterate through test set
     for i, (image, true_label, pred_label) in enumerate(zip(X_test, y_test, y_pred)):
         if true_label == pred_label:
-            # Plot the image
+            # Plot the corrected predicted images
             axes[row_index, col_index].imshow(image)
             axes[row_index, col_index].axis('off')
             axes[row_index, col_index].set_title(f"True: {list_folder[true_label]}\nPredicted: {list_folder[pred_label]}")
@@ -127,7 +119,31 @@ if __name__ == '__main__':
     for i in range(row_index, 5):
         for j in range(col_index, 10):
             fig.delaxes(axes[i, j])
-
+    
     # Save the aggregated correct predictions image
     plt.tight_layout()
     plt.savefig("correct_predictions.png")
+    
+    fig1, axes1 = plt.subplots(nrows=4, ncols=10, figsize=(20, 10))
+    row_index1 = 0
+    col_index1 = 0
+    # Plot the misclassified images
+    for i, (image, true_label, pred_label) in enumerate(zip(X_test, y_test, y_pred)):
+        if true_label != pred_label:
+            axes1[row_index1, col_index1].imshow(image)
+            axes1[row_index1, col_index1].axis('off')
+            axes1[row_index1, col_index1].set_title(f"True: {list_folder[true_label]}\nPredicted: {list_folder[pred_label]}")
+            col_index1 += 1
+            if col_index1 == 10:
+                row_index1 += 1
+                col_index1 = 0
+            if row_index1 == 4:
+                break
+
+    # Remove empty subplots
+    for i in range(row_index1, 4):
+        for j in range(col_index1, 10):
+            fig1.delaxes(axes1[i, j])
+    
+    plt.tight_layout()
+    plt.savefig("misclassified_predictions.png")

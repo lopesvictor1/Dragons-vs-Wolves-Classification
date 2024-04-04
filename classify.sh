@@ -24,5 +24,9 @@ fi
 python3 create_dataset.py "$width" "$height"
 # Run the Python "Classifier" program with the chosen classifier
 python3 classifier.py "$classifier"
+# Show the misclassified images
+xdg-open misclassified_predictions.png
 # Show the correct classified images
-display correct_predictions.png
+xdg-open correct_predictions.png
+# Show the confusion matrix
+xdg-open confusion_matrix.png

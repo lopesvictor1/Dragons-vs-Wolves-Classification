@@ -1,4 +1,4 @@
-# Image Classification Project
+# Dragons vs Wolves Classification Project
 
 ## Description
 This project implements a simple image classification system using machine learning classifiers (SVM and MLP) in Python. It allows users to train and evaluate classifiers on a dataset of images. The project also provides a shell script to simplify the process of running the classifiers.

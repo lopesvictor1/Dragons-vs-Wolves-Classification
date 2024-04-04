@@ -1,3 +1,5 @@
+import os
+import sys
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -6,7 +8,6 @@ from sklearn.metrics import confusion_matrix
 from sklearn.neural_network import MLPClassifier
 import seaborn as sns
 import matplotlib.pyplot as plt
-import os
 
 
 
@@ -32,7 +33,7 @@ def mlp_classifier(X_train, X_test):
     X_test_flat = X_test.reshape(X_test.shape[0], -1)
 
     # Create and train the MLP classifier
-    mlp_classifier = MLPClassifier(hidden_layer_sizes=(128,64, 32), max_iter=1000)
+    mlp_classifier = MLPClassifier(hidden_layer_sizes=(128,64, 32), max_iter=1000, verbose = True)
     mlp_classifier.fit(X_train_flat, y_train)
 
     # Predict labels for test data
@@ -43,7 +44,13 @@ def mlp_classifier(X_train, X_test):
 
 
 if __name__ == '__main__':
+    sys.argv = sys.argv[1:]
+    if len(sys.argv) != 1:
+        print(len(sys.argv))
+        print("Usage: python classifier.py <'svm' or 'mlp'>")
+        sys.exit(1)
     folder = os.getcwd()
+    print(sys.argv)
 
     list_folder = sorted(os.listdir(folder))
     class_folders = []
@@ -59,7 +66,12 @@ if __name__ == '__main__':
     # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.2, random_state=42)
 
-    y_pred = mlp_classifier(X_train, X_test)
+
+    if sys.argv[0] == 'mlp':
+        y_pred = mlp_classifier(X_train, X_test)
+    elif sys.argv[0] == 'svm':
+        y_pred = svm_classifier(X_train, X_test)
+
     
     # Calculate accuracy
     accuracy = accuracy_score(y_test, y_pred)
@@ -77,7 +89,7 @@ if __name__ == '__main__':
     plt.show()
 
     misclassified_indices = np.where(y_pred != y_test)[0]
-    '''
+
     # Show misclassified images
     for index in misclassified_indices:
         print("True Label:", list_folder[y_test[index]], ", Predicted Label:", list_folder[y_pred[index]])
@@ -85,9 +97,9 @@ if __name__ == '__main__':
         plt.axis('off')
         plt.title("True Label:" + list_folder[y_test[index]] + ", Predicted Label:" + list_folder[y_pred[index]])
         plt.show()
-    '''
+
     # Create a figure to aggregate correct predictions
-    fig, axes = plt.subplots(nrows=10, ncols=10, figsize=(20, 10))
+    fig, axes = plt.subplots(nrows=5, ncols=10, figsize=(20, 10))
 
     # Initialize counter for subplot indices
     row_index = 0
@@ -108,15 +120,14 @@ if __name__ == '__main__':
                 col_index = 0
                 
             # Break if all subplots are filled
-            if row_index == 10:
+            if row_index == 5:
                 break
 
     # Remove empty subplots
-    for i in range(row_index, 10):
+    for i in range(row_index, 5):
         for j in range(col_index, 10):
             fig.delaxes(axes[i, j])
 
     # Save the aggregated correct predictions image
     plt.tight_layout()
     plt.savefig("correct_predictions.png")
-    plt.show()

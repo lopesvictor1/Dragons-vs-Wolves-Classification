@@ -1,8 +1,9 @@
 import os
+import sys
 import cv2
 import numpy as np
 
-def load_images_from_folder(folder):
+def load_images_from_folder(folder, width, height):
     """
     Load images and corresponding labels from a folder structure where each subdirectory represents a class.
 
@@ -27,19 +28,31 @@ def load_images_from_folder(folder):
                 if img_path.endswith(".jpg") or img_path.endswith(".jpeg"):
                     image = cv2.imread(img_path)
                     # Resize or preprocess image if needed
-                    resized_image = cv2.resize(image, (14, 14))
+                    resized_image = cv2.resize(image, (width, height))
                     images.append(resized_image)
                     labels.append(class_label)
     return np.array(images), np.array(labels)
 
-# Example usage:
-folder = os.getcwd()
-images, labels = load_images_from_folder(folder)
 
-# Save images and labels to numpy arrays
-np.save("images.npy", images)
-np.save("labels.npy", labels)
 
-print("Images shape: ", images.shape)
-print("Labels shape: ", labels.shape)
+if __name__ == "__main__":
+    sys.argv = sys.argv[1:]
+    if len(sys.argv) != 2:
+        print(len(sys.argv))
+        print("Usage: python create_dataset.py <image width> <image height>")
+        sys.exit(1)
+    
+    width = int(sys.argv[0])
+    height = int(sys.argv[1])
+    
+    # Example usage:
+    folder = os.getcwd()
+    images, labels = load_images_from_folder(folder, width, height)
+
+    # Save images and labels to numpy arrays
+    np.save("images.npy", images)
+    np.save("labels.npy", labels)
+
+    print("Images shape: ", images.shape)
+    print("Labels shape: ", labels.shape)
 
